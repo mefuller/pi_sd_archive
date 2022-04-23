@@ -58,7 +58,7 @@ def main():
         action="store_true",
         dest="img_zip",
         help="Flag for whether image should be compressed when archiving or decompressed before writing",
-        default=True,
+        default=False,
     )
 
     # variables
@@ -102,9 +102,9 @@ def main():
 
         print(
             """
-            This program will likely require being run with root ('sudo') permissions!'
-            It relies on the 'dd' utility - please see its documentation for additional information on input and output file names/destinations.
-            """
+        This program will likely require being run with root ('sudo') permissions!'
+        It relies on the 'dd' utility - please see its documentation for additional information on input and output file names/destinations.
+        """
         )
 
         parser.print_help()
