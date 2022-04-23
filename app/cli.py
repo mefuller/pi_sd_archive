@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import sys
+import subprocess
 from argparse import ArgumentParser
 
 # https://docs.python.org/3/library/argparse.html
@@ -71,44 +72,99 @@ def main():
     parser.add_argument(
         "-o",
         "--outfile",
-        default="./sd.img",
+        default="/dev/mmcblk0",
         help="Output file for operation",
         type=str,
     )
 
     args = parser.parse_args()
 
-    print(
+    if not args.quiet:
+        print(
+            """
+        pi_sd_archive: a command line utility to backup, clone, SD cards
+        Copyright (C) 2022  Mark E. Fuller (fuller@fedoraproject.org)
+
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <https://www.gnu.org/licenses/>.
         """
-    pi_sd_archive: a command line utility to backup, clone, SD cards
-    Copyright (C) 2022  Mark E. Fuller (fuller@fedoraproject.org)
+        )
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+        print(
+            """
+            This program will likely require being run with root ('sudo') permissions!'
+            It relies on the 'dd' utility - please see its documentation for additional information on input and output file names/destinations.
+            """
+        )
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-    """
-    )
-
-    parser.print_help()
+        parser.print_help()
 
     # some sanity checks
     if args.infile == args.outfile:
-        print("\nSource and destination files are the same. Exiting.")
-        sys.exit(1)
+        sys.exit("\nSource and destination files are the same. Exiting.")
     elif args.create_archive and args.write_disk:
-        print("\nBoth archive and write options provided. Exiting.")
-        sys.exit(1)
+        sys.exit("\nBoth archive and write options provided. Exiting.")
 
-    #
+    # create archive
+    if args.create_archive:
+        # strip ".tar.gz" if provided
+        subprocess.run(
+            [
+                "dd",
+                "bs=4M",
+                "conv=fsync",
+                "status=progress",
+                f"if={args.infile}",
+                f"of={args.outfile.removesuffix('.tar.gz')}",
+            ]
+        )
+        subprocess.run(
+            ["./pi_shrink/pishrink.sh", f"{args.outfile.removesuffix('.tar.gz')}"]
+        )
+        if args.img_zip:
+            # compress image to tar.gz
+            try:
+                subprocess.run(
+                    [
+                        "tar",
+                        "-czf",
+                        args.outfile,
+                        f"{args.outfile.removesuffix('.tar.gz')}",
+                    ]
+                )
+            except:
+                sys.exit("\nError decompressing image. Is it tar.gz? Exiting.")
+
+    # writing to disk
+    elif args.write_disk:
+        if args.img_zip:
+            # decompress tar.gz
+            try:
+                subprocess.run(["tar", "-xzf", args.infile])
+            except:
+                sys.exit("\nError decompressing image. Is it tar.gz? Exiting.")
+
+        # write image, dropping ".tar.gz" from name provided, if given
+        subprocess.run(
+            [
+                "dd",
+                "bs=4M",
+                "conv=fsync",
+                "status=progress",
+                f"if={args.infile.removesuffix('.tar.gz')}",
+                f"of={args.outfile}",
+            ]
+        )
 
 
 if __name__ == "__main__":
