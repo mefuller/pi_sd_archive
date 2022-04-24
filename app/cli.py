@@ -129,7 +129,7 @@ def main():
             ]
         )
         subprocess.run(
-            ["./pi_shrink/pishrink.sh", f"{args.outfile.removesuffix('.tar.gz')}"]
+            ["./PiShrink/pishrink.sh", f"{args.outfile.removesuffix('.tar.gz')}"]
         )
         if args.img_zip:
             # compress image to tar.gz

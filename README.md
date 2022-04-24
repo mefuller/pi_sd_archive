@@ -1,17 +1,17 @@
-# python-cli-template
+# pi-sd-archive
 
-A starting point for building Python Command Line Applications.
+A CLI for creating archival images of SD cards and writing those images anew,
+particularly with the Raspberry Pi in mind.
 
 ## About 
 
-This project serves as a starting point to developing command line modules with Python. It is structured in such a way that 
-when we call the module it executes the main method in `app/cli.py`. This is typically where you would want to add 
-your own logic.
+This project provides a CLI to wrap `dd`, `tar`, and the [PiShrink](https://github.com/Drewsif/PiShrink) utility.
 
-The setup.py file includes some advanced patterns and best 
-practices for setup.py, as well as some commented–out nice–to–haves. For example, it provides a `python 
-setup.py upload` command, which creates a universal wheel (and sdist) and uploads your package to PyPi using Twine. 
-It also creates/uploads a new git tag, automatically.
+The common location of `/dev/mmcblk0` is provided as a default to minimize
+typing.
+
+Obviously there's a lot more that could be done right as the current version is
+quite bare-bones - pull requests are welcome.
 
 ## Setup
 
