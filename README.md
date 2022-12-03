@@ -13,7 +13,17 @@ typing.
 Obviously there's a lot more that could be done right as the current version is
 quite bare-bones - pull requests are welcome.
 
-## Setup
+## Setup and Use
+
+I'm in the middle of fixing up some things and upgrading a wheel.
+
+For now, the following works:
+
+```sh
+sudo python cli.py -a -z -o kodi_20221203.img
+```
+
+Please test that this is still ok:
 
 ```
 virtualenv env

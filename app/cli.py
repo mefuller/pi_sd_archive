@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import os
 import sys
 import subprocess
 from argparse import ArgumentParser
@@ -128,8 +129,9 @@ def main():
                 f"of={args.outfile.removesuffix('.tar.gz')}",
             ]
         )
+        pwd = os.getcwd()
         subprocess.run(
-            ["./PiShrink/pishrink.sh", f"{args.outfile.removesuffix('.tar.gz')}"]
+            [f"{os.getcwd()}/PiShrink/pishrink.sh", f"{args.outfile.removesuffix('.tar.gz')}"]
         )
         if args.img_zip:
             # compress image to tar.gz
